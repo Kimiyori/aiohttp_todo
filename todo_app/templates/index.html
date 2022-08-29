@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+<h1>TODO LIST</h1>
+<div id="container">
+    <input type="text" id="todoinput" placeholder="What you gonna do?" autocomplete="off">
+    <ul id="todolist">
+        {% for task in tasks %}
+        <li data-id="{{ task.id }}">{{ task.body }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    const input = document.querySelector('#todoinput');
+    input.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const url = "{{ url('create_task') }}";
+            let data = {};
+            data['task'] = this.value;
+            data['user_id'] = '{{ current_user.user_id }}';
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (!response.ok) throw Error(response.statusText);
+                return response.json();
+            }).then(json => {
+                let task_list = document.querySelector('#todolist');
+                let li_element = document.createElement('li');
+                li_element.innerHTML = json.body;
+                li_element.dataset.id = json.id;
+                task_list.appendChild(li_element)
+                this.value='';
+            })
+        }
+    })
+
+let task_elements=document.querySelector('#todolist');
+task_elements.addEventListener('click',function (e){
+    const task= e.target;
+    const data={'id':task.dataset.id}
+    const url="{{ url('delete_task') }}";
+    fetch(url, {
+        method:'POST',
+        body:JSON.stringify(data),
+        headers: {
+                    'Content-Type': 'application/json'
+                }
+    }).then(response => {
+                if (!response.ok) throw Error(response.statusText);
+                return response.json();
+            }).then( json => {
+                task_elements.removeChild(task)
+            })
+})
+</script>
+{% endblock %}

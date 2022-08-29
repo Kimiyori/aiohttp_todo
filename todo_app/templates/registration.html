@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<hgroup>
+    <h2>Welcome back!</h2>
+    <p>Please enter your details to create your account</p>
+</hgroup>
+
+    {% if error %}<div class="error" style="color: red;"><strong>Error:</strong> {{ error }}</div>{% endif %}
+    <form action="/login" method = "post" class = "log-form">
+
+        <div class="group log-input">
+            <input type="text" id = "username" name = "username" placeholder = "Username">
+        </div>
+        <div class="group log-input">
+            <input type="text" id = "email" name = "email"  placeholder = "Email">
+        </div>
+        <div class="group log-input">
+            <input type="password" id = "password" name = "password"  placeholder = "Password">
+        </div>
+        <div class="btn-wrap">
+        <input class="login-btn" type="submit" value="Sign Up"/>
+        </div>
+    </form>
+
+{% endblock %}

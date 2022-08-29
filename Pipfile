@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+aiohttp = "*"
+pyyaml = "*"
+sqlalchemy = "*"
+aiopg = {extras = ["sa"], version = "*"}
+psycopg2 = "*"
+aiohttp-jinja2 = "*"
+aiohttp-security = "*"
+aiohttp-session = "*"
+asyncpgsa = "*"
+aioredis = "*"
+bcrypt = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
