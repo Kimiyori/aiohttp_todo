@@ -3,6 +3,8 @@ from aiohttp import web
 from aiohttp_security import forget, authorized_userid
 from todo_app.views import redirect
 from aiohttp_session import get_session
+
+
 async def handle_404(request):
     return aiohttp_jinja2.render_template('404.html', request, {}, status=404)
 
@@ -29,20 +31,23 @@ def create_error_middleware(overrides):
 
     return error_middleware
 
+
 @web.middleware
 async def login_middleware(request, handler):
-    if request.path=='/' :
-        user = await authorized_userid(request)
-        if user:
-            request['user'] = {'user_id':user['user_id'],'username':user['user_name']}
-        else:  # user is None
-            raise redirect(request.app.router, 'login')
+    user = await authorized_userid(request)
+    if user:
+        request.user = {'user_id': user['user_id'],
+                        'username': user['user_name']}
+    if request.path == '/' and not user:
+        raise redirect(request.app.router, 'login')
     return await handler(request)
+
 
 @web.middleware
 async def session_middleware(request, handler):
     request.session = await get_session(request)
     return await handler(request)
+
 
 def setup_middlewares(app):
     error_middleware = create_error_middleware({
@@ -50,6 +55,5 @@ def setup_middlewares(app):
         500: handle_500
     })
     app.middlewares.append(error_middleware)
-    app.middlewares.append(session_middleware)
+    #app.middlewares.append(session_middleware)
     app.middlewares.append(login_middleware)
-

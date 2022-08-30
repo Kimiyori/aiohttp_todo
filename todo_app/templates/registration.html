@@ -3,13 +3,12 @@
 {% block content %}
 
 <hgroup>
-    <h2>Welcome back!</h2>
+    <h2>Welcome!</h2>
     <p>Please enter your details to create your account</p>
 </hgroup>
 
-    {% if error %}<div class="error" style="color: red;"><strong>Error:</strong> {{ error }}</div>{% endif %}
-    <form action="/login" method = "post" class = "log-form">
-
+    <form action="/registration" method = "post" class = "log-form">
+        {% if error %}<div class="error" style="color: red;"><strong>Error:</strong> {{ error }}</div>{% endif %}
         <div class="group log-input">
             <input type="text" id = "username" name = "username" placeholder = "Username">
         </div>
