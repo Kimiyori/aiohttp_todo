@@ -3,11 +3,11 @@ version: "3.9"
 services:
   web:
     build: .
-    command: python -m todo_app 0.0.0.0:8080 
+    command: gunicorn todo_app.main:main --bind 0.0.0.0:8080 --worker-class aiohttp.GunicornWebWorker
     volumes:
       - .:/aiohttp
-    ports:
-      - 8080:8080
+    expose:
+      - 8080
     depends_on:
       - db
   db:
@@ -22,5 +22,15 @@ services:
     image: redis:alpine
     ports:
       - 6379:6379
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    depends_on:
+      - web
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+      - .:/aiohttp
 volumes:
   postgres_data:

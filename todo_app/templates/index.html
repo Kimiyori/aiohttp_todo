@@ -9,7 +9,12 @@
     <input type="text" id="todoinput" placeholder="What you gonna do?" autocomplete="off">
     <ul id="todolist">
         {% for task in tasks %}
-        <li data-id="{{ task.id }}">{{ task.body }}</li>
+        <li contentEditable=true data-id="{{ task.id }}">
+            {{ task.body }}
+            <div contentEditable=false class="completed_button">
+                done
+            </div>
+        </li>
         {% endfor %}
     </ul>
 </div>
@@ -38,29 +43,72 @@
                 let li_element = document.createElement('li');
                 li_element.innerHTML = json.body;
                 li_element.dataset.id = json.id;
-                task_list.appendChild(li_element)
-                this.value='';
+                li_element.setAttribute("contenteditable", true);
+                let done_element = document.createElement('div');
+                done_element.setAttribute("contenteditable", false);
+                done_element.classList.add("completed_button");
+                done_element.innerHTML='done';
+                li_element.appendChild(done_element);
+                task_list.appendChild(li_element);
+                this.value = '';
             })
         }
     })
 
-let task_elements=document.querySelector('#todolist');
-task_elements.addEventListener('click',function (e){
-    const task= e.target;
-    const data={'id':task.dataset.id}
-    const url="{{ url('delete_task') }}";
-    fetch(url, {
-        method:'POST',
-        body:JSON.stringify(data),
-        headers: {
-                    'Content-Type': 'application/json'
-                }
-    }).then(response => {
-                if (!response.ok) throw Error(response.statusText);
-                return response.json();
-            }).then( json => {
-                task_elements.removeChild(task)
-            })
-})
+
+
+    
+    let task_elements = document.querySelector('#todolist');
+
+
+    task_elements.addEventListener('input', function (e) {
+        const task = e.target;
+        if (task.tagName=='LI') {
+            task_update(task)
+        }
+        
+    })
+
+    function task_update(task) {
+        const data = { 'id': task.dataset.id ,'body':task.childNodes[0].nodeValue}
+        const url = "{{ url('update_task') }}";
+        fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (!response.ok) throw Error(response.statusText);
+            return response.json();
+        })
+    }
+
+
+    task_elements.addEventListener('click', function (e) {
+        const task = e.target;
+        if (task.tagName=='DIV') {
+            task_delete(task)
+        }
+    })
+
+
+
+    function task_delete(task) {
+        const data = { 'id': task.parentNode.dataset.id }
+        const url = "{{ url('delete_task') }}";
+        fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (!response.ok) throw Error(response.statusText);
+            return response.json();
+        }).then(json => {
+            task_elements.removeChild(task.parentNode)
+        })
+    }
 </script>
 {% endblock %}

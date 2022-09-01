@@ -71,13 +71,13 @@ async def init_app():
     return app
 
 
-def main():
+async def main():
     logging.basicConfig(level=logging.DEBUG)
 
-    app = init_app()
+    app = await  init_app()
+    return app
+    #web.run_app(app)
 
-    web.run_app(app)
 
-
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+    #main()

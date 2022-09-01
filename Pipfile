@@ -15,6 +15,7 @@ aiohttp-session = "*"
 asyncpgsa = "*"
 aioredis = "*"
 bcrypt = "*"
+gunicorn = "*"
 
 [dev-packages]
 

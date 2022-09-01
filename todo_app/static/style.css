@@ -285,8 +285,16 @@ input {
   margin: 10px 0;
   background-color: transparent;
   border-bottom: 2px solid rgb(255, 0, 43);
-  cursor: pointer;
   word-break: break-all;
+  outline: 0px solid transparent;
+  justify-content: space-between
+
+
+
+
+
+
+
 }
 
 #todolist li:hover {
@@ -295,10 +303,10 @@ input {
   border-bottom: 2px solid grey;
 }
 
-#todolist li:hover::after {
-  content: "Completed";
-  margin-left: auto;
-  margin-right: 5px;
-  font-size: 0.8em;
-}
 
+
+
+.completed_button:hover {
+  cursor: pointer;
+  visibility: visible;
+}

@@ -1,7 +1,7 @@
 import aiopg.sa
 from sqlalchemy import (
     MetaData, Table, Column, ForeignKey,
-    Integer, String, Date
+    Integer, String, Date,asc
 )
 
 from todo_app.security import generate_password_hash
@@ -34,7 +34,7 @@ task = Table(
 async def get_user_tasks(conn, user):
     result = await conn.execute(task
                                 .select()
-                                .where(task.c.user_id == user))
+                                .where(task.c.user_id == user).order_by(asc(task.c.id)))
     return await result.fetchall()
 
 async def delete_task(conn, id):
@@ -48,6 +48,10 @@ async def create_task(conn, task_body, user):
         user_id=user).returning(task.c.id, task.c.body))
     return await result.fetchone()
 
+async def update_task(conn, task_body, id):
+    result = await conn.execute(task.update().where(task.c.id==id).values(
+        body=task_body).returning(task.c.body))
+    return await result.fetchone()
 
 async def create_user(conn, form):
     result = await conn.execute(users.insert().values(
