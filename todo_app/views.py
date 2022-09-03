@@ -6,7 +6,7 @@ from aiohttp_security import forget
 from todo_app.db_auth import remember
 
 
-def redirect(router, route_name):
+def redirect(router, route_name:str):
     location = router[route_name].url_for()
     return web.HTTPFound(location)
 
@@ -27,10 +27,10 @@ class RegistrationView(web.View):
     async def post(self):
         form = await self.request.post()
         async with self.request.app['db'].acquire() as conn:
-            error = validate_registration_form(form)
+            error: str | None = validate_registration_form(form)
             if error:
                 return {'error': error}
-            user = await db.create_user(conn, form)
+            user: list(int,str)= await db.create_user(conn, form)
             user_data = {'user_id': user[0], 'user_name': user[1]}
             response = redirect(self.request.app.router, 'index')
             await remember(self.request, response, user_data)
@@ -49,7 +49,7 @@ class LoginView(web.View):
         form = await self.request.post()
 
         async with self.request.app['db'].acquire() as conn:
-            user = await validate_login_form(conn, form)
+            user: str | list(int,str) = await validate_login_form(conn, form)
             if isinstance(user, str):
                 return {'error': user}
             response = redirect(self.request.app.router, 'index')
@@ -69,7 +69,7 @@ async def logout(request):
 async def delete_task(request):
     if request.method == 'POST':
         async with request.app['db'].acquire() as conn:
-            form = await request.json()
+            form: dict(str,str) = await request.json()
             await db.delete_task(conn, form['id'])
             return web.json_response({})
 
@@ -78,22 +78,22 @@ async def create_task(request):
 
     if request.method == 'POST':
         async with request.app['db'].acquire() as conn:
-            form = await request.json()
+            form: dict(str,str) = await request.json()
             task = await db.create_task(conn, form['task'], form['user_id'])
             return web.json_response({'id': task[0], 'body': task[1]})
 
-async def update_task(request):
+async def update_task(request:web.Request):
     if request.method == 'POST':
         async with request.app['db'].acquire() as conn:
-            form = await request.json()
+            form: dict(str,str) = await request.json()
             task = await db.update_task(conn, form['body'], form['id'])
             return web.json_response({ 'body': task[0]})
 
 
 
 @aiohttp_jinja2.template('index.html')
-async def index(request):
+async def index(request:web.Request):
     async with request.app['db'].acquire() as conn:
-        records = await db.get_user_tasks(conn, request.user['user_id'])
+        records: dict(int,str) = await db.get_user_tasks(conn, request.user['user_id'])
         tasks = [dict(q) for q in records]
         return {'tasks': tasks}

@@ -5,18 +5,18 @@ from todo_app.views import redirect
 from aiohttp_session import get_session
 
 
-async def handle_404(request):
+async def handle_404(request:web.Request):
     return aiohttp_jinja2.render_template('404.html', request, {}, status=404)
 
 
-async def handle_500(request):
+async def handle_500(request:web.Request):
     return aiohttp_jinja2.render_template('500.html', request, {}, status=500)
 
 
 def create_error_middleware(overrides):
 
     @web.middleware
-    async def error_middleware(request, handler):
+    async def error_middleware(request:web.Request, handler):
         try:
             return await handler(request)
         except web.HTTPException as ex:
